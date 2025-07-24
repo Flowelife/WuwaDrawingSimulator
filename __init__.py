@@ -47,7 +47,7 @@ class PrizePool:
         return cls._prize_info['version'][version]
     
     @classmethod
-    def get_prize_pool_info(cls, prize_pool: str = '胜利为我喝彩') -> dict:
+    def get_prize_pool_info(cls, prize_pool: str = '挽歌永不落幕') -> dict:
         """获取指定卡池的up信息。
         
         RETURN:
@@ -68,7 +68,7 @@ class PrizePool:
         return list(cls._prize_info['prize_pool'].keys())
     
     @classmethod
-    def prize_pool_generate(cls, prize_pool: str = '胜利为我喝彩') -> dict:
+    def prize_pool_generate(cls, prize_pool: str = '挽歌永不落幕') -> dict:
         """生成指定卡池内容字典。
         
         RETURN:

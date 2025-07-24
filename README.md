@@ -74,7 +74,7 @@ print(result.count)
 `CardDrawingSimulator`初始化参数如下:
 |参数名|类型|用途|取值|默认值|
 |---|---|---|---|---|
-|prize_pool|dict|需要模拟抽取的卡池|由`PrizePool.prize_pool_generate(prize_pool)`生成|`胜利为我喝彩`卡池|
+|prize_pool|dict|需要模拟抽取的卡池|由`PrizePool.prize_pool_generate(prize_pool)`生成|`挽歌永不落幕`卡池|
 |inherit_5_guaranteed_counts|int|已经多少抽没有出5星了|[0,80]|0|
 |inherit_4_guaranteed_counts|int|已经多少抽没有出4星了|[0,10]|0|
 |_5_upper_promise|bool|下一个5星是否必定为up|True or False|False|
