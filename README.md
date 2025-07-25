@@ -1,51 +1,60 @@
 # 鸣潮抽卡模拟器
 
 ## 效果
-![GOLD](./docs/gold.png)
+
+![GOLD](./docs/gold_less_10.png)
+![GOLD](./docs/gold_more_10.png)
 
 ## 干啥的
+
 一个简单实现了鸣潮卡池模拟的Python库，包含1.0至今的所有角色/武器卡池。
 
 ## 用法
+
 ### 安装依赖
-请确认您的电脑环境中一包含以下库。
+
+请确认您的电脑环境中包含以下库。
+
 - pillow (PIL)
 
 若未安装请使用 `pip` 进行安装。
+
 ```bash
 pip install pillow
 ```
 
 ### 使用
+
 将此库克隆到您的项目中并引用。
+
 ```bash
 git clone https://github.com/Flowelife/WuwaDrawingSimulator.git
 ```
+
 在您的代码中导入`CardDrawingSimulator`即可快速体验。
 
 ```python
-from WuwaDrawingSimulator import CardDrawingSimulator
+from WuwaDrawingSimulator import Simulator
 
-simulator = CardDrawingSimulator()
+simulator = Simulator()
 result = simulator.draw()
 
 print(result)
 
 '''OUTPUT
-Reward(3-star: 9, 4-star: 1, 5-star: 0, rewards: [('源能音感仪·测五', 3), ('远行者臂铠·破障', 3), ('暗夜臂铠·夜芒', 3), ('
-暗夜长刃·玄明', 3), ('远行者矩阵·探幽', 3), ('远行者佩枪·洞察', 3), ('暗夜佩枪·暗星', 3), ('暗夜矩阵·暝光', 3), ('远行者臂
-铠·破障', 3), ('永夜长明', 4)])
+Reward(3-star: 9, 4-star: 1, 5-star: 0, rewards: [('远行者臂铠·破障', 3), ('源能音感仪·测五', 3), ('暗夜臂铠·夜芒', 3), ('源能长刃·测壹', 3), ('远行者迅刀·旅迹', 3), ('源能臂铠·测肆', 3), ('远行者长刃·辟路', 3), ('暗夜长刃·玄明', 3), ('远行者矩阵·探幽', 3), ('TAOQI', 4)], time: 2025-07-25 14:25:08, prize_pool: 挽歌永不落幕)
 '''
 ```
 
 同一`simulator`进行多次抽取会自动累计保底值。
-```python
-from WuwaDrawingSimulator import CardDrawingSimulator, Reward
 
-result = Reward([])
-simulator = CardDrawingSimulator()
+```python
+from WuwaDrawingSimulator import Simulator, Reward, SimulatorConfig
+
+result = Reward([], SimulatorConfig.default_prize_pool)
+simulator = Simulator()
 for _ in range(16): # 一个大保底（160抽）
-    print(f'5星保底{simulator._5_guaranteed_counts}/80 是否为大保底: {simulator._5_upper_promise}')
+    print(f'5星保底{simulator.guaranteed_counts_5}/80 是否为大保底: {simulator.upper_promise_5}')
     result += simulator.draw()
 
 print(result.count)
@@ -71,34 +80,94 @@ print(result.count)
 '''
 ```
 
-`CardDrawingSimulator`初始化参数如下:
-|参数名|类型|用途|取值|默认值|
-|---|---|---|---|---|
-|prize_pool|dict|需要模拟抽取的卡池|由`PrizePool.prize_pool_generate(prize_pool)`生成|`挽歌永不落幕`卡池|
-|inherit_5_guaranteed_counts|int|已经多少抽没有出5星了|[0,80]|0|
-|inherit_4_guaranteed_counts|int|已经多少抽没有出4星了|[0,10]|0|
-|_5_upper_promise|bool|下一个5星是否必定为up|True or False|False|
-|_4_upper_promise|bool|下一个4星是否必定为up|True or False|False|
+`Simulator`初始化参数如下:
+
+| 参数名                      | 类型 | 用途                  | 取值                                              | 默认值             |
+| --------------------------- | ---- | --------------------- | ------------------------------------------------- | ------------------ |
+| prize_pool                  | dict | 需要模拟抽取的卡池    | str 卡池名称 | `SimulatorConfig.default_prize_pool`|
+| inherit_guaranteed_counts_5 | int  | 已经多少抽没有出5星了 | int 范围[0,80]                                            | 0                  |
+| inherit_guaranteed_counts_4 | int  | 已经多少抽没有出4星了 | int 范围[0,10]                                            | 0                  |
+| upper_promise_5            | bool | 下一个5星是否必定为up | True or False                                     | False              |
+|upper_promise_4            | bool | 下一个4星是否必定为up | True or False                                     | False              |
 
 `draw()`返回一个`Reward`对象。
 
 `Reward`中封装了抽取结果，分布统计。您可以使用成员`reward`、`count`来访问它们。
 
-成员`to_image()`函数可以将结果转化为`Image`对象。
+```python
+from WuwaDrawingSimulator import Simulator, SimulatorConfig
 
-__*tip:*__ 该函数仅当`Reward`内只有10个元素时才会生效。
+simulator = Simulator()
+result = simulator.draw(80)
+print(f'rewords: {result.rewards}\n')
+print(f'count: {result.count}')
+
+"""OUTPUT
+rewords: [('暗夜长刃·玄明', 3), ('远行者迅刀·旅迹', 3), ('源能臂铠·测肆', 3), ......, ('源能音感仪·测五', 3), ('TAOQI', 4), ('暗夜臂铠·夜芒', 3)]
+
+count: {'3': 67, '4': 11, '5': 2}
+"""
+```
+
+成员函数`to_image()`可以将结果转化为`Image`对象。不同的元素数量的`Reward`输出的效果也不相同。
+
+
 ```python
 image = result.to_image()
 image.show()
 ```
-![result image](./docs/result.PNG)
+
+10个以内的元素:
+![result image](./docs/result_less_10.png)
+
+10个以上的元素
+![result image](./docs/result_more_10.png)
 
 您可以用这个简单的方式来存储结果。
 ```python
-with open(filename, 'wb') as f: image.save(f)
+image.save(filename)
+```
+
+如果需要进行分割可以使用成员函数`split()`，其接受一个`int`类型的参数`x`来确定每组的元素个数，`x`默认为10，该函数将返回一个包含多个`Reward`的列表。
+```python
+from WuwaDrawingSimulator import Simulator, SimulatorConfig
+
+simulator = Simulator()
+result = simulator.draw(20)
+
+print(result.split())
+print(result.split(5))
+
+"""OUTPUT
+[Reward(3-star: 9, 4-star: 1, 5-star: 0, rewards: [...], time: 2025-07-25 14:16:17, prize_pool: 挽歌永不落幕), Reward(3-star: 7, 4-star: 3, 5-star: 0, rewards: [...], time: 2025-07-25 14:16:17, prize_pool: 挽歌永不落幕)]
+[Reward(3-star: 5, 4-star: 0, 5-star: 0, rewards: [...], time: 2025-07-25 14:16:17, prize_pool: 挽歌永不落幕), Reward(3-star: 4, 4-star: 1, 5-star: 0, rewards: [...], time: 2025-07-25 14:16:17, prize_pool: 挽歌永不落幕), Reward(3-star: 4, 4-star: 1, 5-star: 0, rewards: [...], time: 2025-07-25 14:16:17, prize_pool: 挽歌永不落幕), Reward(3-star: 3, 4-star: 2, 5-star: 0, rewards: [...], time: 2025-07-25 14:16:17, prize_pool: 挽歌永不落幕)]
+"""
+```
+
+成员函数`sort()`可以对`Reward`中的元素根据物品星级进行原地排序，默认从低到高，将参数`reverse`设置为`True`可以修改为从高到低。
+```python
+from WuwaDrawingSimulator import Simulator
+
+simulator = Simulator()
+result = simulator.draw()
+
+print("org: ", result.rewards)
+
+result.sort(True)
+print("htl: ", result.rewards)
+
+result.sort()
+print("lth: ", result.rewards)
+
+"""OUTPUT
+org:  [('源能音感仪·测五', 3), ('远行者臂铠·破障', 3), ('远行者矩阵·探幽', 3), ('远行者迅刀·旅迹', 3), ('暗夜长刃·玄明', 3), ('远行者佩枪·洞察', 3), ('LUMI', 4), ('源能迅刀·测贰', 3), ('暗夜佩枪·暗星', 3), ('PHROLOVA', 5)]
+htl:  [('PHROLOVA', 5), ('LUMI', 4), ('源能音感仪·测五', 3), ('远行者臂铠·破障', 3), ('远行者矩阵·探幽', 3), ('远行者迅刀·旅迹', 3), ('暗夜长刃·玄明', 3), ('远行者佩枪·洞察', 3), ('源能迅刀·测贰', 3), ('暗夜佩枪·暗星', 3)]
+lth:  [('源能音感仪·测五', 3), ('远行者臂铠·破障', 3), ('远行者矩阵·探幽', 3), ('远行者迅刀·旅迹', 3), ('暗夜长刃·玄明', 3), ('远行者佩枪·洞察', 3), ('源能迅刀·测贰', 3), ('暗夜佩枪·暗星', 3), ('LUMI', 4), ('PHROLOVA', 5)]
+"""
 ```
 
 `PrizePool`类用于查询、创建卡池、角色名字转换。
+
 ```python
 from WuwaDrawingSimulator import PrizePool
 
@@ -127,3 +196,29 @@ prize_pool: {'type': 'character', '3': ['源能长刃·测壹', '源能迅刀·�
 name: 露帕
 '''
 ```
+
+`SimulatorConfig`用于设置模拟器的各项数值，修改后对下一个`Simulator`实例化生效。
+```python
+from WuwaDrawingSimulator import Simulator, SimulatorConfig
+
+simulator_1 = Simulator()   # simulator_1 使用原参数
+
+SimulatorConfig.maximum_draw_5 = 10
+SimulatorConfig.maximum_draw_4 = 7
+
+simulator_2 = Simulator()   # simulator_2 使用修改后的参数 
+```
+可修改的参数：
+|属性|值类型|用途|默认值|
+|---|---|---|---|
+|default_prize_pool |  str  | 默认卡池 | '挽歌永不落幕' |
+|maximum_draw_5 | int  |5星保底次数 | 80 |
+|maximum_draw_4 | int                    |4星保底次数 | 10|
+|basic_probability_5 |  float |5星基础概率 | 0.8 / 100 |
+|basic_probability_4 |  float         |4星基础概率 |6 / 100|
+|charactor_upper_probability | bool    |5星角色是否是不歪池 |False|
+|arms_upper_probability |    bool      |5星武器是否是不歪池 |True |
+|image_font_path | str | 字体文件位置 | os.path.join(os.path.dirname(\_\_file\_\_), 'resources', 'fonts', 'SmileySans-Oblique.ttf') |
+|image_star_font_size | int   | 星级字体大小 | 40 |
+|image_name_font_size | int   | 名称字体大小 | 30 |
+|image_background | tuple\[int,int,int,int\]  | 图片大背景 | (31,31,31,255) |

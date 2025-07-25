@@ -46,12 +46,12 @@
         },
         "行于光影之间": {
             "type": "character",
-            "4": ["DANJIN", "MORTEFI", "YANGYANG"],
+            "4": ["LUMI", "TAOQI", "YUANWU"],
             "5": "ZANI"
         },
         "诗与乐的交响": {
             "type": "character",
-            "4": ["LUMI", "TAOQI", "YUANWU"],
+            "4": ["DANJIN", "MORTEFI", "YANGYANG"],
             "5": "CIACCONA"
         },
         "焰光裁定": {
